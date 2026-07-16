@@ -1,0 +1,70 @@
+# ── Project ────────────────────────────────────────────────────
+node_modules/
+dist/
+*.js.map
+
+# ── Artifacts ─────────────────────────────────────────────────
+artifacts/builds/
+artifacts/archives/
+artifacts/logs/
+artifacts/cache/
+artifacts/ipa/
+*.ipa
+*.xcarchive
+
+# ── Swift ─────────────────────────────────────────────────────
+swift-project/.build/
+swift-project/.swiftpm/
+swift-project/DerivedData/
+*.xcuserdata
+*.xcworkspace/xcuserdata/
+*.dSYM
+*.dSYM.zip
+
+# ── Signing ────────────────────────────────────────────────────
+config/certs/
+config/profiles/
+*.p12
+*.mobileprovision
+*.pem
+*.key
+
+# ── Secrets ───────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+config/app-store-connect-key.json
+secrets/
+
+# ── macOS ─────────────────────────────────────────────────────
+.DS_Store
+__MACOSX/
+
+# ── Windows ───────────────────────────────────────────────────
+Thumbs.db
+desktop.ini
+*.lnk
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+*.log.gz
+
+# ── IDE ───────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ── Python & GUI ──────────────────────────────────────────────
+python-gui/build/
+python-gui/dist/
+__pycache__/
+
+# ── Personal Config ───────────────────────────────────────────
+config/default.yml
+config/*.yaml
+scratch/
+
+# ── Temp/Logs ─────────────────────────────────────────────────
+*.zip
+*.txt

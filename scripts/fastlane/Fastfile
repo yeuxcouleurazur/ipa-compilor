@@ -1,0 +1,106 @@
+# IPA Compilor — Fastlane Configuration
+# Deployed to ~/ipa-compilor/fastlane/ on the Mac build agent
+
+# ── Fastfile ──────────────────────────────────────────────────
+default_platform(:ios)
+
+platform :ios do
+
+  # ── Build + Archive ──────────────────────────────────────────
+  desc "Build and archive the app"
+  lane :build do |options|
+    config = options[:configuration] || "Release"
+    scheme = ENV["PROJECT_NAME"] || "MyApp"
+
+    puts "\n  → Building #{scheme} (#{config})...\n"
+
+    gym(
+      scheme:        scheme,
+      configuration: config,
+      sdk:           "iphoneos",
+      clean:         true,
+      output_directory: "artifacts/ipa",
+      output_name:   "#{scheme}.ipa",
+      export_options: {
+        method:                 ENV["EXPORT_METHOD"] || "ad-hoc",
+        teamID:                 ENV["APPLE_TEAM_ID"] || "",
+        signingStyle:           "manual",
+        stripSwiftSymbols:      true,
+        compileBitcode:         false,
+      },
+      xcargs: "DEVELOPMENT_TEAM=#{ENV["APPLE_TEAM_ID"]} CODE_SIGN_STYLE=Manual"
+    )
+
+    puts "  ✓ IPA ready → artifacts/ipa/#{scheme}.ipa"
+  end
+
+  # ── Sign ──────────────────────────────────────────────────────
+  desc "Sign an existing .ipa"
+  lane :sign do |options|
+    ipa_path = options[:ipa] || "artifacts/ipa/#{ENV["PROJECT_NAME"] || "MyApp"}.ipa"
+    sigh(
+      adhoc:          ENV["EXPORT_METHOD"] == "ad-hoc",
+      team_id:        ENV["APPLE_TEAM_ID"],
+      output_path:    "config/profiles",
+      filename:       "profile.mobileprovision"
+    )
+    puts "  ✓ Signed: #{ipa_path}"
+  end
+
+  # ── TestFlight ────────────────────────────────────────────────
+  desc "Upload to TestFlight"
+  lane :beta do
+    build
+
+    pilot(
+      ipa:                              "artifacts/ipa/#{ENV["PROJECT_NAME"] || "MyApp"}.ipa",
+      api_key_path:                     "config/app-store-connect-key.json",
+      skip_waiting_for_build_processing: true,
+      changelog:                        "Built by IPA Compilor — Windows-First iOS Build Platform"
+    )
+    puts "  ✓ Uploaded to TestFlight"
+  end
+
+  # ── App Store ─────────────────────────────────────────────────
+  desc "Submit to App Store"
+  lane :release do
+    build
+
+    deliver(
+      ipa:          "artifacts/ipa/#{ENV["PROJECT_NAME"] || "MyApp"}.ipa",
+      api_key_path: "config/app-store-connect-key.json",
+      submit_for_review: false,
+      automatic_release: false,
+      force:        true
+    )
+    puts "  ✓ Submitted to App Store"
+  end
+
+  # ── Certificates ──────────────────────────────────────────────
+  desc "Sync certificates via match"
+  lane :certs do
+    match(
+      type:         ENV["EXPORT_METHOD"] || "adhoc",
+      team_id:      ENV["APPLE_TEAM_ID"],
+      git_url:      ENV["MATCH_GIT_URL"] || "",
+      app_identifier: ENV["APPLE_BUNDLE_ID"] || "com.example.myapp",
+      readonly:     true
+    )
+  end
+
+  # ── Diagnostics ───────────────────────────────────────────────
+  desc "Validate signing environment"
+  lane :check do
+    puts "\n  → Checking signing environment...\n"
+    puts "  Team ID:      #{ENV["APPLE_TEAM_ID"] || "(not set)"}"
+    puts "  Bundle ID:    #{ENV["APPLE_BUNDLE_ID"] || "(not set)"}"
+    puts "  Export:       #{ENV["EXPORT_METHOD"] || "ad-hoc"}"
+    puts "  Xcode:        #{`xcode-select -p`.strip}"
+    puts ""
+  end
+
+  # ── Error Handling ────────────────────────────────────────────
+  error do |lane, exception|
+    puts "\n  ✗ Lane #{lane} failed: #{exception.message}\n"
+  end
+end

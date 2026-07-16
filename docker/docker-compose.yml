@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  # ── macOS Build Agent ─────────────────────────────────────
+  build-agent:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ipa-compilor-agent
+    environment:
+      - PROJECT_NAME=${PROJECT_NAME:-MyApp}
+      - TEAM_ID=${APPLE_TEAM_ID:-}
+      - CERT_NAME=${SIGNING_CERT:-iPhone Distribution}
+      - IPA_REMOTE=1
+    volumes:
+      - ../swift-project:/ipa-compilor/swift-project:ro
+      - ../config:/ipa-compilor/config:ro
+      - ../artifacts:/ipa-compilor/artifacts
+      - build-cache:/ipa-compilor/.build
+    ports:
+      - "5900:5900"   # VNC
+      - "2222:22"     # SSH
+    networks:
+      - ipa-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "swift", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Redis Build Cache ─────────────────────────────────────
+  cache:
+    image: redis:7-alpine
+    container_name: ipa-compilor-cache
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - ipa-net
+    restart: unless-stopped
+
+  # ── Artifact Server ───────────────────────────────────────
+  artifacts:
+    image: nginx:alpine
+    container_name: ipa-compilor-artifacts
+    ports:
+      - "8080:80"
+    volumes:
+      - ../artifacts:/usr/share/nginx/html/artifacts:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - ipa-net
+    restart: unless-stopped
+
+volumes:
+  build-cache:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  ipa-net:
+    driver: bridge

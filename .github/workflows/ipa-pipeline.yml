@@ -1,0 +1,78 @@
+name: iOS Build Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build IPA
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Project
+        run: |
+          set -euo pipefail
+
+          WORKSPACE_FILE=$(find . -maxdepth 2 -name "*.xcworkspace" -type d | head -n 1)
+          PROJECT_FILE=$(find . -maxdepth 2 -name "*.xcodeproj" -type d | head -n 1)
+          
+          if [ -n "$WORKSPACE_FILE" ]; then
+            TARGET_FILE="$WORKSPACE_FILE"
+            TARGET_ARG="-workspace"
+            SCHEME_NAME=$(basename "$WORKSPACE_FILE" .xcworkspace)
+          elif [ -n "$PROJECT_FILE" ]; then
+            TARGET_FILE="$PROJECT_FILE"
+            TARGET_ARG="-project"
+            SCHEME_NAME=$(basename "$PROJECT_FILE" .xcodeproj)
+          else
+            echo "Error: No .xcodeproj or .xcworkspace found."
+            exit 1
+          fi
+
+          echo "Building $SCHEME_NAME from $TARGET_FILE..."
+
+          xcodebuild $TARGET_ARG "$TARGET_FILE" \
+            -scheme "$SCHEME_NAME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            build \
+            CONFIGURATION_BUILD_DIR="$(pwd)/build/Release-iphoneos" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
+
+      - name: Export IPA
+        run: |
+          set -euo pipefail
+
+          mkdir -p build/Payload
+
+          APP_PATH=$(find build -name "*.app" -type d | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -n 1)
+          fi
+
+          echo "Found App at: $APP_PATH"
+
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: no .app bundle was produced."
+            exit 1
+          fi
+
+          if [ "false" = "true" ]; then
+            cd "$(dirname "$APP_PATH")"
+            zip -r "$GITHUB_WORKSPACE/Project-Simulator.zip" "$(basename "$APP_PATH")"
+          else
+            cp -R "$APP_PATH" build/Payload/
+            cd build
+            zip -r ../Project-Unsigned.ipa Payload
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Project-Real-Unsigned
+          path: Project-Unsigned.ipa

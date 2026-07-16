@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Content Security Policy to allow inline styles, scripts and images needed for development -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;">
+  <title>IPA Compilor</title>
+  <link rel="stylesheet" href="src/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-icon"></div>
+        <h1>IPA Compilor</h1>
+      </div>
+      <div class="badge">v2.0</div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="content-grid">
+      <!-- Left Panel: Form -->
+      <div class="panel form-panel">
+        <h2 class="panel-title">Build Configuration</h2>
+        
+        <form id="build-form">
+          <!-- Advanced Options (Cloud vs Local) -->
+          <div class="form-group">
+            <label>Build Target Environment</label>
+            <div class="radio-group">
+              <label class="radio-card">
+                <input type="radio" name="build-env" value="cloud" checked>
+                <div class="card-content">
+                  <span class="icon">☁️</span>
+                  <span>Cloud Build</span>
+                </div>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="build-env" value="simulator">
+                <div class="card-content">
+                  <span class="icon">📱</span>
+                  <span>Simulator</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Project Path Selection -->
+          <div class="form-group">
+            <label for="project-path">Swift Project Directory</label>
+            <div class="input-with-button">
+              <input type="text" id="project-path" placeholder="C:\Users\...\MySwiftProject" readonly>
+              <button type="button" id="btn-browse" class="btn secondary">Browse</button>
+            </div>
+            <p class="help-text">Select the folder containing your Xcode project or Package.swift</p>
+          </div>
+
+          <!-- Credentials (Visual only, to match Sideloadly feel, we can pass them to CLI if needed) -->
+          <div class="form-group">
+            <label for="apple-id">Apple ID (Optional for Cloud)</label>
+            <input type="email" id="apple-id" placeholder="developer@apple.com">
+          </div>
+          
+          <div class="form-group">
+            <label for="target-name">Target Scheme Name</label>
+            <input type="text" id="target-name" placeholder="MyApp">
+          </div>
+
+          <div class="action-bar">
+            <button type="submit" id="btn-start" class="btn primary glowing" disabled>
+              <span class="btn-text">Start Compilation</span>
+              <span class="btn-loader" style="display: none;"></span>
+            </button>
+            <button type="button" id="btn-cancel" class="btn danger" style="display: none;">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Panel: Console Output -->
+      <div class="panel console-panel">
+        <div class="console-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="console-title">Terminal output</span>
+        </div>
+        <div class="console-body" id="console-output">
+          <div class="log-line info">Waiting for configuration...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="src/renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "IPA Compilor CLI",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/cli/src/index.ts",
+      "runtimeArgs": ["--loader", "tsx/esm"],
+      "args": ["shell"],
+      "cwd": "${workspaceFolder}",
+      "env": { "IPA_DEBUG": "1" },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Build Pipeline",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/cli/src/index.ts",
+      "runtimeArgs": ["--loader", "tsx/esm"],
+      "args": ["build", "--local"],
+      "cwd": "${workspaceFolder}",
+      "env": { "IPA_DEBUG": "1" },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Diagnostics",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/cli/src/index.ts",
+      "runtimeArgs": ["--loader", "tsx/esm"],
+      "args": ["diag", "--fix"],
+      "cwd": "${workspaceFolder}",
+      "env": { "IPA_DEBUG": "1" },
+      "console": "integratedTerminal"
+    }
+  ]
+}

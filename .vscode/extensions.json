@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "sswg.swift-lang",
+    "ms-vscode.cpptools",
+    "vadimcn.vscode-lldb",
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "ms-vscode-remote.remote-ssh",
+    "ms-azuretools.vscode-docker",
+    "GitHub.vscode-github-actions"
+  ]
+}

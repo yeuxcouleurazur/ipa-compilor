@@ -1,0 +1,46 @@
+name: IPA Compilor — True Build (No Mac Required)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-ios-real:
+    name: Build Real .ipa via GitHub macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: List Xcode installations
+        run: ls -an /Applications/ | grep Xcode
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+      - name: Build and Archive
+        run: |
+          cd swift-project
+          xcodebuild \
+            -scheme MyApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $PWD/MyApp.xcarchive \
+            archive \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Export to IPA (Unsigned Payload)
+        run: |
+          cd swift-project
+          mkdir -p Payload
+          cp -r MyApp.xcarchive/Products/Applications/MyApp.app Payload/
+          zip -r MyApp-Unsigned.ipa Payload
+
+      - name: Upload Real IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyApp-Real-Unsigned
+          path: swift-project/MyApp-Unsigned.ipa
