@@ -49,6 +49,18 @@ If you prefer to run or modify the Python source code:
    python app.py
    ```
 
+### Option C: Command Line Interface (CLI)
+You are not required to use the GUI (Executable or Python). You can also run the compiler natively in your terminal using the underlying Node.js CLI:
+1. Ensure you have **Node.js** installed.
+2. Clone this repository and run from the root folder:
+   ```bash
+   npm install
+   ```
+3. Run the CLI directly on your Swift project:
+   ```bash
+   npx tsx cli/src/index.ts build "C:\Path\To\Your\SwiftProject" --cloud --emulator
+   ```
+
 ---
 
 ## ⚙️ How to Use
