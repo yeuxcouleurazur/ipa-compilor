@@ -61,6 +61,21 @@ You are not required to use the GUI (Executable or Python). You can also run the
    npx tsx cli/src/index.ts build "C:\Path\To\Your\SwiftProject" --cloud --emulator
    ```
 
+#### Available CLI Commands
+The CLI tool provides a rich set of commands for advanced developers:
+
+| Command | Description | Example Usage |
+|---------|-------------|---------------|
+| `shell` | Opens the interactive IPA Compilor terminal dashboard | `npx tsx cli/src/index.ts shell` |
+| `build` | Compiles your Swift project into an `.ipa` | `npx tsx cli/src/index.ts build ./MyProject --cloud` |
+| `sign` | Signs and packages an existing `.ipa` or `.app` | `npx tsx cli/src/index.ts sign -i myapp.app` |
+| `emulate` | Uploads and runs your `.ipa` in the Appetize web emulator | `npx tsx cli/src/index.ts emulate -i app.ipa` |
+| `ota` | Generates Over-The-Air web installation assets | `npx tsx cli/src/index.ts ota -i app.ipa -u https://domain.com` |
+| `sync` | Syncs source code to a remote Mac build agent (if configured) | `npx tsx cli/src/index.ts sync --watch` |
+| `diag` | Runs full environment diagnostics | `npx tsx cli/src/index.ts diag --fix` |
+| `new` | Scaffolds a brand new iOS Swift project structure | `npx tsx cli/src/index.ts new MyApp` |
+| `config` | Interactively configure platform settings and tokens | `npx tsx cli/src/index.ts config` |
+
 ---
 
 ## ⚙️ How to Use
