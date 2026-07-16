@@ -1,105 +1,94 @@
 <div align="center">
   <img src="https://img.icons8.com/color/96/000000/ipa.png" alt="IPA Compilor Logo">
   <h1>IPA Compilor (Cloud Edition)</h1>
-  <p><b>Compile Swift projects into signed IPA files easily via GitHub Actions & Appetize Emulator</b></p>
+  <p><b>A Windows-native solution to compile iOS Swift projects into signed IPA files via Cloud</b></p>
 
   [![Python](https://img.shields.io/badge/Python-3.13-blue.svg?style=flat-square&logo=python)](https://www.python.org/)
-  [![CustomTkinter](https://img.shields.io/badge/CustomTkinter-UI-green.svg?style=flat-square)](#)
+  [![Platform](https://img.shields.io/badge/Platform-Windows-0078D6.svg?style=flat-square&logo=windows)](#)
   [![License](https://img.shields.io/badge/License-MIT-orange.svg?style=flat-square)](LICENSE)
 </div>
 
 <br/>
 
-## 🌟 Overview
-**IPA Compilor** is a professional desktop application designed to streamline the compilation of iOS Swift projects directly from Windows, leveraging cloud computing (GitHub Actions) and optionally running the compiled application in the Appetize.io web emulator.
+## 🌟 What is this project?
+Developing iOS applications historically requires owning an Apple Mac computer to run Xcode. 
+**IPA Compilor** breaks this barrier by allowing you to compile your Swift code into an `.ipa` file directly from a Windows machine.
 
-It completely removes the need for a local macOS environment to build your iOS apps!
+### How it works (Architecture)
+1. **The GUI (This Repository):** A lightweight Windows application (`IPA_Compilor.exe`) where you configure your project settings.
+2. **The Cloud Worker:** When you click "Start", the underlying CLI securely pushes your local Swift code to a private GitHub repository.
+3. **GitHub Actions:** GitHub's cloud servers (which run macOS) compile your code using Xcode, sign the `.ipa`, and send it back to your Windows PC.
+4. **Appetize Emulator:** (Optional) The GUI can automatically upload the compiled `.ipa` to Appetize.io so you can interact with your iOS app inside a web browser!
 
-## ✨ Features
-- **Clean & Simple UI**: A minimal, native-feeling Windows software interface.
-- **Cloud Build System**: Push your code to a remote GitHub worker to compile it remotely.
-- **Appetize.io Integration**: Instantly simulate your built `.ipa` via web emulator.
-- **Standalone Executable**: Run it instantly without installing Python.
+---
+
+## 🛠️ Prerequisites & Required Tools
+Before using the compiler, you must have the following set up:
+
+1. **A GitHub Account:** You need a standard (free) GitHub account to host the cloud worker.
+2. **GitHub Personal Access Token (PAT):** 
+   - Generate a token at `GitHub Settings > Developer settings > Personal access tokens (classic)`.
+   - It must have the `repo` and `workflow` scopes checked.
+3. **The Worker Repository:**
+   - You must fork or create a remote repository (e.g., `your-username/ipa-compilor-worker`) that contains the GitHub Actions workflow file to receive and compile the code.
+4. *(Optional)* **Appetize.io API Token:** Required only if you want to use the web emulator.
 
 ---
 
 ## 🚀 Installation
 
-You have two options to use **IPA Compilor**: using the standalone executable (easiest) or running it from source.
+We provide a **ready-to-use Standalone Executable** so you don't have to install Python or any dependencies on your computer!
 
-### Option A: Standalone Executable (Recommended)
-1. Navigate to the `Release` section of this repository.
-2. Download the `IPA_Compilor.exe` file.
-3. Double-click the file to launch the application immediately (No installation required).
+### Option 1: Standalone `.exe` (Recommended)
+1. Go to the `releases/` folder in this repository.
+2. Download the **`IPA_Compilor.exe`** file.
+3. Double-click to launch it (No installation required).
 
-### Option B: Run from Source (For Developers)
-If you prefer to run or modify the Python source code:
-1. Ensure you have **Python 3.10+** installed on your system.
+### Option 2: Run from Source (For Developers)
+If you prefer to run the Python source code yourself:
+1. Ensure you have **Python 3.10+** and **Node.js** installed.
 2. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/ipa-compilor.git
+   git clone https://github.com/yeuxcouleurazur/ipa-compilor.git
    cd ipa-compilor/python-gui
    ```
-3. Install the dependencies:
+3. Install the dependencies and run:
    ```bash
    pip install -r requirements.txt
-   ```
-4. Run the application:
-   ```bash
    python app.py
    ```
 
-### Option C: Command Line Interface (CLI)
-You are not required to use the GUI (Executable or Python). You can also run the compiler natively in your terminal using the underlying Node.js CLI:
-1. Ensure you have **Node.js** installed.
-2. Clone this repository and run from the root folder:
-   ```bash
-   npm install
-   ```
-3. Run the CLI directly on your Swift project:
-   ```bash
-   npx tsx cli/src/index.ts build "C:\Path\To\Your\SwiftProject" --cloud --emulator
-   ```
+---
 
-#### Available CLI Commands
-The CLI tool provides a rich set of commands for advanced developers:
+## ⚙️ How to Use the GUI
 
-| Command | Description | Example Usage |
-|---------|-------------|---------------|
-| `shell` | Opens the interactive IPA Compilor terminal dashboard | `npx tsx cli/src/index.ts shell` |
-| `build` | Compiles your Swift project into an `.ipa` | `npx tsx cli/src/index.ts build ./MyProject --cloud` |
-| `sign` | Signs and packages an existing `.ipa` or `.app` | `npx tsx cli/src/index.ts sign -i myapp.app` |
-| `emulate` | Uploads and runs your `.ipa` in the Appetize web emulator | `npx tsx cli/src/index.ts emulate -i app.ipa` |
-| `ota` | Generates Over-The-Air web installation assets | `npx tsx cli/src/index.ts ota -i app.ipa -u https://domain.com` |
-| `sync` | Syncs source code to a remote Mac build agent (if configured) | `npx tsx cli/src/index.ts sync --watch` |
-| `diag` | Runs full environment diagnostics | `npx tsx cli/src/index.ts diag --fix` |
-| `new` | Scaffolds a brand new iOS Swift project structure | `npx tsx cli/src/index.ts new MyApp` |
-| `config` | Interactively configure platform settings and tokens | `npx tsx cli/src/index.ts config` |
+1. **Launch the Application**: Open `IPA_Compilor.exe`.
+2. **Project Name**: Enter the name of your app.
+3. **GitHub Owner**: Enter your GitHub username.
+4. **GitHub Repo**: Enter the name of your worker repository (e.g., `ipa-compilor-worker`).
+5. **GitHub Token**: Paste your Personal Access Token.
+6. **Project Folder**: Click "Browse..." and select the local Windows folder containing your Swift code.
+7. **Simulation Mode**: Check the box and enter your Appetize token if you want to preview the app after compilation.
+8. **Start Compilation**: Click the big start button and watch the cloud console build your app live!
 
 ---
 
-## ⚙️ How to Use
+## 💻 Advanced: The Node.js CLI
+The GUI is powered by a robust Node.js Command Line Interface. If you prefer scripting or terminal usage, you can run the CLI directly from the root of this repository:
 
-1. **Launch the Application**: Open `IPA_Compilor.exe` (or run `app.py`).
-2. **Project Info**: Enter your Project Name.
-3. **GitHub Credentials**: 
-   - Enter your **GitHub Owner** (username).
-   - Enter your **GitHub Repo** (the worker repository name).
-   - Enter your **GitHub Token** (Classic PAT with `repo` and `workflow` scopes).
-4. **Select Project**: Click "Browse..." and select the local folder containing your Swift project.
-5. *(Optional) Simulation Mode*: Check "Enable Appetize Simulation Mode" and enter your Appetize API Token if you want to preview the app after building.
-6. **Start**: Click **Start Compilation**. The console will stream the cloud build progress live!
-
----
-
-## 🛠️ Building the .exe Yourself
-Want to compile the `.exe` yourself from the source code?
-Simply run the included batch script:
-```cmd
-cd python-gui
-build.bat
+```bash
+npm install
+npx tsx cli/src/index.ts build "C:\Path\To\Your\SwiftProject" --cloud
 ```
-The compiled executable will be generated in `python-gui/dist/IPA_Compilor.exe`.
+
+| Command | Description |
+|---------|-------------|
+| `shell` | Opens the interactive IPA Compilor terminal dashboard |
+| `build` | Compiles your Swift project into an `.ipa` |
+| `sign` | Signs and packages an existing `.ipa` or `.app` |
+| `emulate` | Uploads and runs your `.ipa` in the Appetize web emulator |
+| `ota` | Generates Over-The-Air web installation assets |
+| `diag` | Runs full environment diagnostics |
 
 ---
-*Made with ❤️ for the iOS Development Community on Windows.*
+*Developed to bridge the gap between Windows developers and the Apple ecosystem.*
